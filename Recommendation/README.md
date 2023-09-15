@@ -5,3 +5,11 @@
 - 데이터
     
     https://drive.google.com/file/d/1KcR9KFGRdsIv2PrfxhiS0rS7nyTJy9-3/view?usp=drive_link\
+
+- 실행 방법
+    - 파일 경로에서 python main.py 입력
+      ```PowerShell
+      python main.py
+      ```
+
+    - 결과는 data 폴더에 csv파일로 저장
