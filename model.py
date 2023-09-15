@@ -16,8 +16,13 @@ from setting import SETTINGS
 class SimModel():
     
     def __init__(self, poke_name, model_name):
+        '''
+        1) poke_name => 유사도를 구하고 싶은 포켓몬 이름
+        2) model_name => layer를 구하고 싶은 모델 이름
+        '''
+        
         self._df = DataLoad()._df_load()
-        self._input_name_idx = self._df[self._df['Name'] == poke_name].index[0]
+        self._input_name_idx = self._df[self._df['Name'] == poke_name].index[0]  # 포켓몬 리스트 df 중에서 입력받은 포켓몬 이름의 인덱스를 반환
         self._model_name = model_name
         
         
@@ -33,6 +38,13 @@ class SimModel():
         
         
     def _extract(self):
+        '''
+        1) folder_dir 경로를 생성. 이미 있을 경우에는 넘어감.
+        2) FC layer 반환 과정
+            a. forder_dir 경로에 model_name_extracted_array.npy 파일이 있으면 불러와서 사용.
+            b. 파일이 없으면 입력받은 모델을 통해 fc layer에서 1d array를 반환.
+        3) 반환받은 array를 저장하고 return.
+        '''
         
         folder_dir = './data/extract/'
         os.makedirs(folder_dir, exist_ok = True)
@@ -62,36 +74,42 @@ class SimModel():
     
     
     def _similarity(self):
+        '''
+        1) 입력받은 포켓몬과 모든 포켓몬과의 코사인 유사도를 계산하여 데이터프레임 생성
+        2) 유사도 기준 상위 5개의 데이터를 출력 및 반환
+        '''
         
         extract = self._extract()
         
         df_result = pd.DataFrame(columns = ['Name','similarity'])
 
-        predicted1 = extract[self._input_name_idx].reshape(-1)
-
-
+        array_input = extract[self._input_name_idx].reshape(-1)
 
         for i in range(len(extract)):
             
             result_list = []
             
-            predicted2 = extract[i].reshape(-1)
+            array_all = extract[i].reshape(-1)
             
-            result = self._cos_sin(predicted1, predicted2)
+            result = self._cos_sin(array_input, array_all)
             
             result_list.append(self._df['Name'][i])
             result_list.append(result)
             
             df_result.loc[i] = result_list
             
-            df_result = df_result.sort_values(by = 'similarity', ascending = False)
-            result = df_result.iloc[2:7].reset_index(drop = True)
+        df_result = df_result.sort_values(by = 'similarity', ascending = False)
+        result = df_result.iloc[2:7].reset_index(drop = True)
             
         display(result)
         return result
         
         
     def showimage(self):
+        '''
+        1) 포켓몬의 이미지와 유사도를 2*3 형태로 출력
+        2) 좌상단에 입력받은 포켓몬 위치        
+        '''
         
         df = self._df
         sim_df = self._similarity()
